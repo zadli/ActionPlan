@@ -10,20 +10,32 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Response;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import ru.zadli.action_plan.R;
+import ru.zadli.action_plan.activities.MainActivity;
+
+import static com.android.volley.Request.Method.GET;
 
 public class MainViewPagerAdapter extends RecyclerView.Adapter<MainViewPagerAdapter.ViewHolder> {
 
@@ -84,6 +96,7 @@ public class MainViewPagerAdapter extends RecyclerView.Adapter<MainViewPagerAdap
         TextView main_time;
         CardView main_cardview;
         RatingBar main_rating;
+        Button main_rating_button;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -96,6 +109,7 @@ public class MainViewPagerAdapter extends RecyclerView.Adapter<MainViewPagerAdap
             main_cardview = itemView.findViewById(R.id.main_cardwiev);
             main_rating = itemView.findViewById(R.id.main_rating);
             main_rating.setNumStars(5);
+            main_rating_button = itemView.findViewById(R.id.main_rating_button);
 
             main_route.setOnClickListener(v -> {
                 try {
@@ -108,6 +122,7 @@ public class MainViewPagerAdapter extends RecyclerView.Adapter<MainViewPagerAdap
                     e.printStackTrace();
                 }
             });
+
             main_cardview.setOnClickListener(v -> {
                 ObjectAnimator animationX = ObjectAnimator.ofFloat(itemView, "ScaleX", 0.85f);
                 ObjectAnimator animationY = ObjectAnimator.ofFloat(itemView, "ScaleY", 0.85f);
@@ -119,7 +134,6 @@ public class MainViewPagerAdapter extends RecyclerView.Adapter<MainViewPagerAdap
                 try {
                     builder.setTitle("Комментарии")
                             .setMessage(response.getJSONObject(getAdapterPosition()).getString("comments"))
-                            .setPositiveButton("Назад", (dialog, id) -> dialog.cancel())
                             .setOnCancelListener(dialog -> {
                                 ObjectAnimator animationXX = ObjectAnimator.ofFloat(itemView, "ScaleX", 1f);
                                 ObjectAnimator animationYY = ObjectAnimator.ofFloat(itemView, "ScaleY", 1f);
@@ -131,11 +145,56 @@ public class MainViewPagerAdapter extends RecyclerView.Adapter<MainViewPagerAdap
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                builder.create().show();
+               builder.create().show();
             });
 
-            main_cardview.setOnLongClickListener(v -> {
-                return true;
+            main_rating_button.setOnClickListener(v -> {
+                ObjectAnimator animationX = ObjectAnimator.ofFloat(itemView, "ScaleX", 0.85f);
+                ObjectAnimator animationY = ObjectAnimator.ofFloat(itemView, "ScaleY", 0.85f);
+                animationX.setDuration(300);
+                animationY.setDuration(300);
+                animationX.start();
+                animationY.start();
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Оставьте комментарий")
+                            .setOnCancelListener(dialog -> {
+                                ObjectAnimator animationXX = ObjectAnimator.ofFloat(itemView, "ScaleX", 1f);
+                                ObjectAnimator animationYY = ObjectAnimator.ofFloat(itemView, "ScaleY", 1f);
+                                animationXX.setDuration(300);
+                                animationYY.setDuration(300);
+                                animationXX.start();
+                                animationYY.start();
+                            });
+                final EditText input = new EditText(context);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT);
+                input.setLayoutParams(lp);
+                builder.setView(input);
+                builder.setPositiveButton("Отправить", (dialog, which) -> {
+                    try {
+                        Volley.newRequestQueue(context).add(new JsonObjectRequest(GET,
+                                "https://api.zadli.me/actionplan/add_comment.php?id="
+                                        +response.getJSONObject(getAdapterPosition()).getInt("id")
+                                        +"&comment="
+                                        +input.getText(),
+                                null,
+                                response -> {
+                                    Toast.makeText(context,"Отправленно",Toast.LENGTH_SHORT).show();
+                                }, error -> {
+                                    Toast.makeText(context,"Ошибка\n" + error,Toast.LENGTH_SHORT).show();
+                        }));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    ObjectAnimator animationXX = ObjectAnimator.ofFloat(itemView, "ScaleX", 1f);
+                    ObjectAnimator animationYY = ObjectAnimator.ofFloat(itemView, "ScaleY", 1f);
+                    animationXX.setDuration(300);
+                    animationYY.setDuration(300);
+                    animationXX.start();
+                    animationYY.start();
+                });
+                builder.create().show();
             });
         }
     }

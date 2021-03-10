@@ -74,21 +74,22 @@
                 android:layout_marginEnd="32dp"
                 android:gravity="center"
                 android:text="TextView"
+                app:layout_constraintBottom_toTopOf="@+id/main_rating"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_name" />
+                app:layout_constraintTop_toBottomOf="@+id/main_name"
+                app:layout_constraintVertical_bias="0.0" />
 
             <RatingBar
                 android:id="@+id/main_rating"
                 style="@style/RatingBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
                 android:layout_marginBottom="32dp"
                 app:layout_constraintBottom_toTopOf="@+id/main_route"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/main_description"
-                app:layout_constraintVertical_bias="1.0" />
+                app:layout_constraintEnd_toStartOf="@+id/main_rating_button"
+                app:layout_constraintStart_toStartOf="parent" />
             <TextView
                 android:id="@+id/main_route"
                 android:layout_width="match_parent"
@@ -125,6 +126,19 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
+
+            <Button
+                android:id="@+id/main_rating_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="32dp"
+                android:background="@drawable/ic_add_comment"
+                android:backgroundTint="#EC6118"
+                app:iconTint="#EC6118"
+                app:layout_constraintBottom_toBottomOf="@+id/main_rating"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/main_rating"
+                app:strokeColor="#EC6118" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
